@@ -55,6 +55,8 @@
 
   * Fix unicode symbols and HTML entities in question.html (Matt West).
 
+  * Add Redis to support websockets when running with multiple servers (Nathan Walters).
+
 * __2.11.0__ - 2017-12-29
 
   * Add support for partial credit in Homeworks (Tim Bretl).
