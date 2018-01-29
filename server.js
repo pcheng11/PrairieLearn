@@ -1,28 +1,29 @@
-var ERR = require('async-stacktrace');
-var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
-var favicon = require('serve-favicon');
-var async = require('async');
-var express = require('express');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var passport = require('passport');
-var http = require('http');
-var https = require('https');
+const ERR = require('async-stacktrace');
+const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
+const favicon = require('serve-favicon');
+const async = require('async');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const http = require('http');
+const https = require('https');
 
-var logger = require('./lib/logger');
-var config = require('./lib/config');
-var externalGrader = require('./lib/externalGrader');
-var externalGradingSocket = require('./lib/externalGradingSocket');
-var assessment = require('./lib/assessment');
-var sqldb = require('./lib/sqldb');
-var migrations = require('./migrations');
-var sprocs = require('./sprocs');
-var cron = require('./cron');
-var socketServer = require('./lib/socket-server');
-var serverJobs = require('./lib/server-jobs');
-var freeformServer = require('./question-servers/freeform.js');
+const logger = require('./lib/logger');
+const config = require('./lib/config');
+const externalGrader = require('./lib/externalGrader');
+const externalGradingSocket = require('./lib/externalGradingSocket');
+const assessment = require('./lib/assessment');
+const sqldb = require('./lib/sqldb');
+const migrations = require('./migrations');
+const sprocs = require('./sprocs');
+const cron = require('./cron');
+const redis = require('./lib/redis');
+const socketServer = require('./lib/socket-server');
+const serverJobs = require('./lib/server-jobs');
+const freeformServer = require('./question-servers/freeform.js');
 
 if (config.startServer) {
     logger.info('PrairieLearn server start');
@@ -414,6 +415,12 @@ if (config.startServer) {
         },
         function(callback) {
             cron.init(function(err) {
+                if (ERR(err, callback)) return;
+                callback(null);
+            });
+        },
+        (callback) => {
+            redis.init((err) => {
                 if (ERR(err, callback)) return;
                 callback(null);
             });
