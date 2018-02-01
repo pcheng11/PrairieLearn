@@ -8,6 +8,7 @@ var debug = require('debug')('prairielearn:instructorAssessment');
 
 var error = require('../../lib/error');
 var logger = require('../../lib/logger');
+var config = require('../../lib/config');
 var serverJobs = require('../../lib/server-jobs');
 var csvMaker = require('../../lib/csv-maker');
 var dataFiles = require('../../lib/data-files');
@@ -84,7 +85,10 @@ router.get('/', function(req, res, next) {
         },
         function(callback) {
             debug('query assessment_access_rules');
-            var params = {assessment_id: res.locals.assessment.id};
+            var params = {
+                assessment_id: res.locals.assessment.id,
+                link_exam_id: config.syncExamIdAccessRules,
+            };
             sqldb.query(sql.assessment_access_rules, params, function(err, result) {
                 if (ERR(err, callback)) return;
                 res.locals.access_rules = result.rows;
