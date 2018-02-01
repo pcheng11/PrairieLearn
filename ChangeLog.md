@@ -25,6 +25,8 @@
 
   * Add course-instance-wide issue reporting flag (Matt West).
 
+  * Add per-assessment PrairieSchedule exam linking (Matt West).
+
   * Fix broken file upload element (Nathan Walters).
 
   * Fix broken popover and improve assessment label styles (Nathan Walters).

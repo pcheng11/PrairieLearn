@@ -74,13 +74,13 @@ WHERE NOT EXISTS (
 -- BLOCK insert_assessment_access_rule
 INSERT INTO assessment_access_rules
         (assessment_id,  number,  mode,  role,  credit,  uids,          time_limit_min,
-        password,
+         password,  exam_id,
         start_date,
         end_date)
 (
     SELECT
         $assessment_id, $number, $mode, $role, $credit, $uids::TEXT[], $time_limit_min,
-        $password,
+        $password, $exam_id,
         input_date($start_date, ci.display_timezone),
         input_date($end_date, ci.display_timezone)
     FROM
@@ -96,6 +96,7 @@ SET
     credit = EXCLUDED.credit,
     time_limit_min = EXCLUDED.time_limit_min,
     password = EXCLUDED.password,
+    exam_id = EXCLUDED.exam_id,
     uids = EXCLUDED.uids,
     start_date = EXCLUDED.start_date,
     end_date = EXCLUDED.end_date;
