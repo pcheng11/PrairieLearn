@@ -27,6 +27,8 @@
 
   * Add advertisement for HackIllinois 2018 (Matt West).
 
+  * Add "Report cheating" page in Exam mode (Matt West).
+
   * Fix broken file upload element (Nathan Walters).
 
   * Fix broken popover and improve assessment label styles (Nathan Walters).
