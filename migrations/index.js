@@ -1,18 +1,36 @@
-var ERR = require('async-stacktrace');
-var fs = require('fs');
-var path = require('path');
-var async = require('async');
+const ERR = require('async-stacktrace');
+const fs = require('fs');
+const path = require('path');
+const async = require('async');
 
-var error = require('../lib/error');
-var logger = require('../lib/logger');
-var sqldb = require('../lib/sqldb');
-var sqlLoader = require('../lib/sql-loader');
+const namedLocks = require('../lib/named-locks');
+const error = require('../lib/error');
+const logger = require('../lib/logger');
+const sqldb = require('../lib/sqldb');
+const sqlLoader = require('../lib/sql-loader');
 
-var sql = sqlLoader.loadSqlEquiv(__filename);
+const sql = sqlLoader.loadSqlEquiv(__filename);
 
 module.exports = {};
 
 module.exports.init = function(callback) {
+    const lockName = 'migrations';
+    logger.verbose(`Waiting for lock ${lockName}`);
+    namedLocks.waitLock(lockName, (err, lock) => {
+        if (ERR(err, callback)) return;
+        logger.verbose(`Acquired lock ${lockName}`);
+        this._initWithLock((err) => {
+            namedLocks.releaseLock(lock, (lockErr) => {
+                if (ERR(lockErr, callback)) return;
+                if (ERR(err, callback)) return;
+                logger.verbose(`Released lock ${lockName}`);
+                callback(null);
+            });
+        });
+    });
+};
+
+module.exports._initWithLock = function(callback) {
     logger.verbose('Starting DB schema migration');
     let noExistingMigrations = false;
 
