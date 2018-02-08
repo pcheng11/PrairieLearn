@@ -29,6 +29,8 @@
 
   * Add blocked-event-loop monitor (Matt West).
 
+  * Add example of how to use PL to learn student names (Tim Bretl).
+
   * Fix broken file upload element (Nathan Walters).
 
   * Fix broken popover and improve assessment label styles (Nathan Walters).
