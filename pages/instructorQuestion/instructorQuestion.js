@@ -12,7 +12,8 @@ var sqlLoader = require('../../lib/sql-loader');
 var debug = require('debug')('prairielearn:instructorQuestion');
 
 var sql = sqlLoader.loadSqlEquiv(__filename);
-
+const path = require('path');
+var fs = require('fs');
 var sanitizeName = function(name) {
     return name.replace(/[^a-zA-Z0-9]/g, '_');
 };
@@ -98,7 +99,120 @@ function processIssue(req, res, callback) {
 }
 
 router.post('/', function(req, res, next) {
-    if (req.body.__action == 'grade' || req.body.__action == 'save') {
+    // console.log("Hi");
+    // console.log(req.body.title_value);
+    if (req.body.__action == 'edit_title') {
+        // console.log(req.body.question_id);
+        // console.log(req.body.title_value);
+        var sql = "UPDATE questions SET title = ";
+        sql += '\''+ req.body.title_value + '\'';
+        sql += " WHERE id = ";
+        sql += req.body.question_id;
+        console.log(sql);
+        sqldb.query(sql, {}, function (err, result){
+            if (ERR(err, next)) return;
+            res.redirect(req.originalUrl);
+        });
+        question_dir = path.join(res.locals.course.path, 'questions', res.locals.question.directory);
+        filePath = path.join(question_dir, 'info.json');
+        fs.readFile(filePath, { encoding: 'utf-8' }, function (err, content) {
+            if (!err) {
+                console.log(content);
+                var new_content = JSON.parse(content);
+                new_content.title = req.body.title_value;
+                
+                fs.writeFile(filePath, JSON.stringify(new_content), function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+                console.log(new_content);
+            });
+
+            } else {
+                console.log(err);
+            }
+        });
+    }
+    else if (req.body.__action == 'edit_qid') {
+        console.log("ID");
+        var sql = "UPDATE questions SET  qid= ";
+        sql += '\'' + req.body.qid_value + '\'';
+        sql += " WHERE id = ";
+        sql += req.body.question_id;
+        console.log(sql);
+        sqldb.query(sql, {}, function (err, result) {
+            if (ERR(err, next)) return;
+            res.redirect(req.originalUrl);
+        });
+        
+    
+    }
+    else if (req.body.__action == 'edit_type') {
+        var sql = "UPDATE questions SET type = ";
+        sql += '\'' + req.body.type_value + '\'';
+        sql += " WHERE id = ";
+        sql += req.body.question_id;
+        console.log(sql);
+        sqldb.query(sql, {}, function (err, result) {
+            if (ERR(err, next)) return;
+            res.redirect(req.originalUrl);
+        });
+        // question_dir = path.join(res.locals.course.path, 'questions', res.locals.question.directory);
+        // filePath = path.join(question_dir, 'info.json');
+        // fs.readFile(filePath, { encoding: 'utf-8' }, function (err, content) {
+        //     if (!err) {
+        //         console.log(content);
+        //         var new_content = JSON.parse(content);
+        //         new_content.type = req.body.type_value;
+
+        //         fs.writeFile(filePath, JSON.stringify(new_content), function (err) {
+        //             if (err) {
+        //                 return console.log(err);
+        //             }
+        //             console.log("The file was saved!");
+        //             console.log(new_content);
+        //         });
+
+        //     } else {
+        //         console.log(err);
+        //     }
+        // });
+    }
+    else if (req.body.__action == 'edit_topic') {
+        var sql = "UPDATE questions SET topic_id = ";
+        sql += "(SELECT id FROM topics WHERE name = ";
+        sql += '\'' + req.body.topic_value + '\''+ ")";
+        sql += " WHERE id = ";
+        sql += req.body.question_id;
+        console.log(sql);
+        console.log(req.body.topic_value);
+        sqldb.query(sql, {}, function (err, result) {
+            if (ERR(err, next)) return;
+            res.redirect(req.originalUrl);
+        });
+        question_dir = path.join(res.locals.course.path, 'questions', res.locals.question.directory);
+        filePath = path.join(question_dir, 'info.json');
+        fs.readFile(filePath, { encoding: 'utf-8' }, function (err, content2) {
+            if (!err) {
+                console.log(content2);
+                var new_content = JSON.parse(content2);
+                new_content.topic= req.body.topic_value;
+                fs.writeFile(filePath, JSON.stringify(new_content), function (err) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                    console.log("The file was saved!");
+                    console.log(new_content);
+                });
+
+            } else {
+                console.log(err);
+            }
+        });
+    }
+
+    else if (req.body.__action == 'grade' || req.body.__action == 'save') {
         processSubmission(req, res, function(err, variant_id) {
             if (ERR(err, next)) return;
             res.redirect(res.locals.urlPrefix + '/question/' + res.locals.question.id
@@ -119,17 +233,20 @@ router.post('/', function(req, res, next) {
             res.redirect(res.locals.urlPrefix + '/jobSequence/' + job_sequence_id);
         });
     } else if (req.body.__action == 'report_issue') {
+        console.log(req.body.description)
         processIssue(req, res, function(err, variant_id) {
             if (ERR(err, next)) return;
             res.redirect(res.locals.urlPrefix + '/question/' + res.locals.question.id
                          + '/?variant_id=' + variant_id);
         });
-    } else {
+    }
+    else {
         return next(new Error('unknown __action: ' + req.body.__action));
     }
 });
 
 router.get('/', function(req, res, next) {
+
     async.series([
         (callback) => {
             debug('set filenames');
@@ -139,7 +256,36 @@ router.get('/', function(req, res, next) {
         (callback) => {
             sqldb.query(sql.assessment_question_stats, {question_id: res.locals.question.id}, function(err, result) {
                 if (ERR(err, callback)) return;
+                // console.warn(results.length);
                 res.locals.assessment_stats = result.rows;
+                callback(null);
+            });
+        },
+        (callback) => {
+            sqldb.query(sql.get_topics, { course_id: res.locals.course.id }, function (err, result) {
+                if (ERR(err, callback)) return;
+                // console.log(res.locals.course.id)
+                // console.log("Hi")
+                // console.log(result.rows[0])
+                res.locals.topics = result.rows[0].topics;
+                callback(null);
+            });
+        },
+        (callback) => {
+            sqldb.query(sql.get_tags, { course_id: res.locals.course.id }, function (err, result) {
+                if (ERR(err, callback)) return;
+                // console.log(res.locals.course.id)
+                // console.log(result.rows[0])
+                res.locals.alltags = result.rows[0].tags;
+                callback(null);
+            });
+        },
+        (callback) => {
+            sqldb.query(sql.get_types, {}, function (err, result) {
+                // console.log(result.rows);
+                if (ERR(err, callback)) return;
+                res.locals.alltypes = result.rows;
+                // console.log(res.locals.alltypes);
                 callback(null);
             });
         },

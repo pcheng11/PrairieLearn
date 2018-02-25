@@ -24,60 +24,139 @@
     <%- include('../partials/navbar', {navPage: ''}); %>
     <div id="content" class="container">
       <div class="card mb-4">
-        <div class="card-header bg-primary text-white">Question <%= question.qid %></div>
+        <div class="card-header bg-primary text-white">Question <%= question.qid %>
 
-        <div class="table-responsive">
-          <table class="table table-sm table-hover two-column-description">
-            <tbody>
-              <tr>
-                <th>Title</th>
-                <td><%= question.title %></td>
-              </tr>
-              <tr>
+        </div>
+        <!-- <form class="form-horizontal"> -->
+          <div class="table-responsive">
+            <table class="table table-sm table-hover two-column-description">
+              <tbody>
+                <tr>
+                  <th>Title</th>
+                  <td><%= question.title %></td>
+                  <td class="align-right">
+                   <form method = "POST">
+                      <!-- <div class="form-group"> -->
+                       Change Title: 
+                      <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                       <input type="text" class="form-control" name="title_value" value="<%= question.title %>">
+                       <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                      <!-- </div> -->
+                        <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_title">Save</button>
+                    </form>
+                    </td>
+                </tr>
+
+               <tr>
                 <th>QID</th>
-                <td><%= question.qid %>
-                    <% if (questionGHLink) { %>(<a target="_blank" href="<%= questionGHLink %>">view on GitHub</a>)<% } %>
+                <td>
+                  <%= question.qid %>
+                
+                <% if (questionGHLink) { %>(
+                  <a target="_blank" href="<%= questionGHLink %>">view on GitHub</a>)
+                  <% } %>
                 </td>
-              </tr>
+                <td class="align-right">
+                <form method="POST">
+                      Change QID:
+                      <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                      <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                      <input type="text" class="form-control" name="qid_value" value="<%= question.qid %>">
+
+                    <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_qid">Save</button>
+                </form>
+                </td>
+               </tr>
+
               <tr>
                 <th>Type</th>
-                <td><%= question.type %></td>
-              </tr>
-              <tr>
-                <th>Topic</th>
-                <td><%- include('../partials/topic', {topic: topic}); %></td>
-              </tr>
-              <tr>
-                <th>Tags</th>
-                <td><%- include('../partials/tags', {tags: tags}); %></td>
-              </tr>
-              <tr>
-                <th>Issues</th>
-                <td><%- include('../partials/issueBadge', {count: open_issue_count}); %></td>
-              </tr>
-              <tr>
-                <th>Assessments</th>
-                <td><%- include('../partials/assessments', {assessments: assessments}); %></td>
-              </tr>
-              <% if (question.type == 'Freeform') { %>
-              <tr>
-                <th class="align-middle">Tests</th>
                 <td>
-                  <form method="POST">
-                    <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
-                    <button class="btn btn-sm btn-outline-primary" name="__action" value="test_once">
-                      Test once with full details
-                    </button>
-                    <button class="btn btn-sm btn-outline-primary" name="__action" value="test_100">
-                      Test 100 times with only results
-                    </button>
-                  </form>
+                  <%= question.type %>
+                <td>
+                <td class="align-right">
+                <form method="POST">
+                  <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                  <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                  
+                     <% alltypes.forEach(function(type) { %>
+                                        <label>
+                                          <input name="type_value" value="<%= type.types %>" type="checkbox">
+                                          <%= type.types %>
+                                        </label>
+                                        <% }); %>
+                      <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_type">Save</button>
+                </form>
                 </td>
               </tr>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
+
+              <tr>
+                <th>Topics</th>
+                  <td>
+                  <%- include('../partials/topic', {topics: topics}); %>
+                  </td>
+                    <td>
+                      <form method="POST">
+                        <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                        <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                        <!-- <select data-placeholder ="Please choose tags"  multiple class="chosen-select" name="test"> -->
+                        <% topics.forEach(function(topic) { %>
+                          <label>
+                            <input name="topic_value"  value= "<%= topic.name %>" type="checkbox"><%= topic.name %></label>
+                        <% }); %>
+                    
+                    <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_topic">Save</button>
+                    </form>
+                  </td>
+              </tr>
+
+              <tr>
+              <th>Tags</th>
+                  <td>
+                    <%- include('../partials/tags', {tags: tags}); %>
+                  </td>
+                  <td class="align-right">
+                    <form method="POST">
+                      <% alltags.forEach(function(tag) { %>
+                        
+                        <label>
+                          <input type="hidden" name="tag_value" value="<%= tag.id %>">
+                          <input name="topic_value" value="<%= tag.name %>" type="checkbox">
+                          <%= tag.name %>
+                        </label>
+                        <% }); %>
+                    <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_tag">Save</button>
+                </form>
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>Issues</th>
+                  <td><%- include('../partials/issueBadge', {count: open_issue_count}); %></td>
+                </tr>
+                <tr>
+                  <th>Assessments</th>
+                  <td><%- include('../partials/assessments', {assessments: assessments}); %></td>
+                </tr>
+                <% if (question.type == 'Freeform') { %>
+                <tr>
+                  <th class="align-middle">Tests</th>
+                  <td>
+                    <form method="POST">
+                      <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                      <button class="btn btn-sm btn-outline-primary" name="__action" value="test_once">
+                        Test once with full details
+                      </button>
+                      <button class="btn btn-sm btn-outline-primary" name="__action" value="test_100">
+                        Test 100 times with only results
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        <!-- </form> -->
         <div class="card-footer">
           <button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#issueCollapse" aria-expanded="false" aria-controls="issueCollapse">
             Report an issue with this question

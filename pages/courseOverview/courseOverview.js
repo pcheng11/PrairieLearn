@@ -10,6 +10,7 @@ var sqlLoader = require('../../lib/sql-loader');
 var sql = sqlLoader.loadSqlEquiv(__filename);
 
 router.get('/', function(req, res, next) {
+    console.log("Hi")
     var params = {
         course_id: res.locals.course.id,
     };
@@ -17,6 +18,7 @@ router.get('/', function(req, res, next) {
         if (ERR(err, next)) return;
 
         _.assign(res.locals, result.rows[0]);
+        console.log(result.rows);
         res.render(__filename.replace(/\.js$/, '.ejs'), res.locals);
     });
 });

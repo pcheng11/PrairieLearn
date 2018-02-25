@@ -24,3 +24,25 @@ GROUP BY
     ci.id
 ORDER BY
     admin_assessment_question_number(aq.id);
+
+
+-- BLOCK get_topics
+
+SELECT
+coalesce(jsonb_agg(to_jsonb(topic.*) ORDER BY topic.number), '[]'::jsonb) AS topics
+FROM
+    topics AS topic
+WHERE
+    topic.course_id = $course_id
+
+-- BLOCK get_tags
+
+SELECT
+    coalesce(jsonb_agg(to_jsonb(tag.*) ORDER BY tag.number), '[]'::jsonb) AS tags
+    FROM
+        tags AS tag
+    WHERE
+        tag.course_id = $course_id
+
+-- BLOCK get_types
+SELECT unnest(enum_range(NULL::enum_question_type)) as types

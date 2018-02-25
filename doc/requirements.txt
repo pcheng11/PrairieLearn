@@ -1,2 +1,0 @@
-# bogus requirements file to keep makethedocs happy
-numpy

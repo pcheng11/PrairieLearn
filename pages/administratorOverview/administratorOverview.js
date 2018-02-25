@@ -58,6 +58,7 @@ router.post('/', function(req, res, next) {
             req.body.value,
             res.locals.authn_user.user_id,
         ];
+        console.log(params);
         sqldb.call('courses_update_column', params, function(err, _result) {
             if (ERR(err, next)) return;
             res.redirect(req.originalUrl);
