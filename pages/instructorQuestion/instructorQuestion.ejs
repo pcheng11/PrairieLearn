@@ -19,6 +19,21 @@
     <script src="/localscripts/question<%= effectiveQuestionType %>.js"></script>
     <% } %>
     <%- extraHeadersHtml %>
+    <!-- Editor -->
+    <link href="/stylesheets/editor.css" rel="stylesheet" />
+    <style type="text/css" media="screen">
+      #editor { 
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+      }
+    </style>
+    <script src="/javascripts/editor.js"></script>
+    <script src="/javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    
+
   </head>
   <body>
     <%- include('../partials/navbar', {navPage: ''}); %>
@@ -34,16 +49,29 @@
                 <tr>
                   <th>Title</th>
                   <td><%= question.title %></td>
-                  <td class="align-right">
-                   <form method = "POST">
-                      <!-- <div class="form-group"> -->
+                  <td class="float-right">
+
+                    <form method="POST">
+                      <a class="btn btn-sm btn-outline-secondary float-right" data-toggle="collapse" href="#collapseTitle" role="button" aria-expanded="false" aria-controls="collapseExample">
+                         Change Title
+                      </a>
+                      <div class="collapse" id="collapseTitle">
+                        <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                        <input type="text" class="form-control" name="title_value" value="<%= question.title %>">
+                        <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                          <button class="btn btn-sm btn-primary" name="__action" value="edit_title">Save</button>
+                      </div>
+                    
+                    </form>
+                   <!-- <form method = "POST">
+                    
                        Change Title: 
                       <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
                        <input type="text" class="form-control" name="title_value" value="<%= question.title %>">
                        <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
-                      <!-- </div> -->
-                        <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_title">Save</button>
-                    </form>
+              
+                        <button class="btn btn-sm btn-primary" name="__action" value="edit_title">Save</button>
+                    </form> -->
                     </td>
                 </tr>
 
@@ -56,15 +84,29 @@
                   <a target="_blank" href="<%= questionGHLink %>">view on GitHub</a>)
                   <% } %>
                 </td>
-                <td class="align-right">
-                <form method="POST">
+                <td class="float-right">
+                  <form method="POST">
+                    <a class="btn btn-sm btn-outline-secondary float-right" data-toggle="collapse" href="#collapseQid" role="button" aria-expanded="false"
+                      aria-controls="collapseExample">
+                      Change QID
+                    </a>
+                    <div class="collapse" id="collapseQid">
+                    <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                    <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                    <input type="text" class="form-control" name="qid_value" value="<%= question.qid %>">
+                    
+                    <button class="btn btn-sm btn-primary" name="__action" value="edit_qid">Save</button>
+                    </div>
+
+                  </form>
+                <!-- <form method="POST">
                       Change QID:
                       <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
                       <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
                       <input type="text" class="form-control" name="qid_value" value="<%= question.qid %>">
 
-                    <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_qid">Save</button>
-                </form>
+                    <button class="btn btn-sm btn-primary" name="__action" value="edit_qid">Save</button>
+                </form> -->
                 </td>
                </tr>
 
@@ -72,10 +114,29 @@
                 <th>Type</th>
                 <td>
                   <%= question.type %>
-                <td>
-                <td class="align-right">
+                </td>
+                <td class="float-right">
                 <form method="POST">
-                  <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                  <a class="btn btn-sm btn-outline-secondary float-right" data-toggle="collapse" href="#collapseType" role="button" aria-expanded="false"
+                    aria-controls="collapseExample">
+                    Change Type
+                  </a>
+                  <div class="collapse" id="collapseType">
+                    <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                    <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
+                    
+                    <% alltypes.forEach(function(type) { %>
+                      <label>
+                        <input name="type_value" value="<%= type.types %>" type="checkbox">
+                        <%= type.types %>
+                      </label>
+                      <% }); %>
+                        <button class="btn btn-sm btn-primary" name="__action" value="edit_type">Save</button>
+                  </div>
+                
+                </form>
+                <form method="POST">
+                  <!-- <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
                   <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
                   
                      <% alltypes.forEach(function(type) { %>
@@ -84,7 +145,7 @@
                                           <%= type.types %>
                                         </label>
                                         <% }); %>
-                      <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_type">Save</button>
+                      <button class="btn btn-sm btn-primary" name="__action" value="edit_type">Save</button> -->
                 </form>
                 </td>
               </tr>
@@ -94,8 +155,13 @@
                   <td>
                   <%- include('../partials/topic', {topics: topics}); %>
                   </td>
-                    <td>
+                    <td class="float-right">
                       <form method="POST">
+                        <a class="btn btn-sm btn-outline-secondary float-right" data-toggle="collapse" href="#collapseTopic" role="button" aria-expanded="false"
+                          aria-controls="collapseExample">
+                          Change Topic
+                        </a>
+                        <div class="collapse" id="collapseTopic">
                         <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
                         <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
                         <!-- <select data-placeholder ="Please choose tags"  multiple class="chosen-select" name="test"> -->
@@ -104,7 +170,8 @@
                             <input name="topic_value"  value= "<%= topic.name %>" type="checkbox"><%= topic.name %></label>
                         <% }); %>
                     
-                    <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_topic">Save</button>
+                      <button class="btn btn-sm btn-primary" name="__action" value="edit_topic">Save</button>
+                          </div>
                     </form>
                   </td>
               </tr>
@@ -114,8 +181,13 @@
                   <td>
                     <%- include('../partials/tags', {tags: tags}); %>
                   </td>
-                  <td class="align-right">
+                  <td class="float-right">
                     <form method="POST">
+                      <a class="btn btn-sm btn-outline-secondary float-right" data-toggle="collapse" href="#collapseTag" role="button" aria-expanded="false"
+                        aria-controls="collapseExample">
+                        Change Tag
+                      </a>
+                      <div class="collapse" id="collapseTag">
                       <% alltags.forEach(function(tag) { %>
                         
                         <label>
@@ -124,7 +196,8 @@
                           <%= tag.name %>
                         </label>
                         <% }); %>
-                    <button class="btn btn-sm btn-outline-primary" name="__action" value="edit_tag">Save</button>
+                    <button class="btn btn-sm btn-primary" name="__action" value="edit_tag">Save</button>
+                    </div>
                 </form>
                   </td>
                 </tr>
@@ -176,6 +249,43 @@
           </div>
         </div>
       </div>
+
+      <div class="card mb-4" id="container">
+          <div class="card-header bg-primary text-white">Question Editor</div>
+          <form method="POST">
+            <a class="btn btn-outline-secondary" data-toggle="collapse" href="#collapseContent" role="button" aria-expanded="false" aria-controls="collapseExample">
+              Open the editor
+            </a>
+            <div class="float-right">
+              <input type="hidden" id="updated_question_content" name="updated_question_content">
+              <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+              <button class="btn btn-outline-success" name="__action" value="update_question" onclick="update(editor)">
+                Save and reload
+              </button>
+            </div>
+            
+          </form>
+          
+          <div class="collapse" id="collapseContent">
+            <div class="card card-body">
+              <div id="wrapper">
+                <div id="editor"></div>
+                <script>
+                    var question_content_base64 = '<%- question_content_base64 %>';
+                    var question_content = atob(question_content_base64);
+                    document.getElementById('editor').style.fontSize='20px';
+                    var editor = ace.edit("editor");
+                    editor.session.setValue(question_content);
+                    editor.setTheme("ace/theme/monokai");
+                    editor.session.setMode("ace/mode/html"); // TODO: user-defined file type
+                    editor.session.setUseWorker(false)
+                    editor.setShowPrintMargin(false);
+                    editor.resize();
+                </script>
+              </div>
+            </div>
+          </div>
+        </div>
 
       <%- include('../partials/question', {question_context: 'instructor'}); %>
 

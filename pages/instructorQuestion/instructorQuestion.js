@@ -239,8 +239,18 @@ router.post('/', function(req, res, next) {
             res.redirect(res.locals.urlPrefix + '/question/' + res.locals.question.id
                          + '/?variant_id=' + variant_id);
         });
-    }
-    else {
+    } else if (req.body.__action == 'update_question') {
+        const updated_question_content = req.body.updated_question_content;
+        question_dir = path.join(res.locals.course.path, 'questions', res.locals.question.directory);
+        filePath = path.join(question_dir, 'question.html');  // TODO: user-defined files
+        fs.writeFile(filePath, updated_question_content, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            console.log("The file was saved!");
+        }); 
+        res.redirect(res.locals.urlPrefix + '/question/' + res.locals.question.id);
+    } else {
         return next(new Error('unknown __action: ' + req.body.__action));
     }
 });
@@ -248,6 +258,20 @@ router.post('/', function(req, res, next) {
 router.get('/', function(req, res, next) {
 
     async.series([
+        (callback) => {
+            question_dir = path.join(res.locals.course.path, 'questions', res.locals.question.directory);
+            
+            filePath = path.join(question_dir, 'question.html');
+            fs.readFile(filePath, {encoding: 'utf-8'}, function(err,data){
+                if (!err) {
+                    res.locals.question_content_base64 = Buffer.from(data).toString('base64');
+                    res.locals.question_path = filePath;
+                } else {
+                    console.log(err);
+                }
+            });
+            callback(null);
+        },
         (callback) => {
             debug('set filenames');
             _.assign(res.locals, filenames(res.locals));

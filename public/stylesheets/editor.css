@@ -1,0 +1,10 @@
+.fill { 
+        height: auto;
+}
+
+#editor, #collapseContent {
+        position: relative;
+        width: auto;
+        height: 300px;
+        margin-bottom: 25px;
+}
