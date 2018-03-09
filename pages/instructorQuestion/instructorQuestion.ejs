@@ -167,7 +167,7 @@
                         <!-- <select data-placeholder ="Please choose tags"  multiple class="chosen-select" name="test"> -->
                         <% topics.forEach(function(topic) { %>
                           <label>
-                            <input name="topic_value"  value= "<%= topic.name %>" type="checkbox"><%= topic.name %></label>
+                            <input name="topic_value"  value= "<%= topic.name %>" type="radio"><%= topic.name %></label>
                         <% }); %>
                     
                       <button class="btn btn-sm btn-primary" name="__action" value="edit_topic">Save</button>
@@ -180,6 +180,7 @@
               <th>Tags</th>
                   <td>
                     <%- include('../partials/tags', {tags: tags}); %>
+                    <% console.log(tags);%>
                   </td>
                   <td class="float-right">
                     <form method="POST">
@@ -188,11 +189,12 @@
                         Change Tag
                       </a>
                       <div class="collapse" id="collapseTag">
+                      <input type="hidden" name="__csrf_token" value="<%= __csrf_token %>">
+                      <input type="hidden" class="form-control" name="question_id" value="<%= question.id %>">
                       <% alltags.forEach(function(tag) { %>
                         
                         <label>
-                          <input type="hidden" name="tag_value" value="<%= tag.id %>">
-                          <input name="topic_value" value="<%= tag.name %>" type="checkbox">
+                          <input name="tag_id" value="<%= tag.id %>" type="checkbox">
                           <%= tag.name %>
                         </label>
                         <% }); %>

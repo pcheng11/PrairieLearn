@@ -45,4 +45,47 @@ SELECT
         tag.course_id = $course_id
 
 -- BLOCK get_types
-SELECT unnest(enum_range(NULL::enum_question_type)) as types
+SELECT unnest(enum_range(NULL::enum_question_type)) AS types
+
+-- BLOCK insert_question_tag
+INSERT INTO question_tags
+    (question_id, tag_id, number)
+VALUES
+    ($question_id, $tag_id, $tag_number)
+ON CONFLICT
+(question_id, tag_id) DO
+UPDATE
+SET
+    number = EXCLUDED.number
+RETURNING id;
+
+-- BLOCK get_number_of_tags
+SELECT 
+    number AS tag_number
+    FROM 
+        tags
+    WHERE 
+        id = $tag_id
+
+
+-- BLOCK edit_topic
+UPDATE questions 
+SET topic_id =
+(SELECT id FROM topics WHERE name = $topic_value)
+WHERE id = $question_id
+
+
+-- BLOCK edit_type
+UPDATE questions 
+SET type = $type_value
+WHERE id = $question_id
+
+-- BLOCK edit_qid
+UPDATE questions 
+SET qid = $qid_value
+WHERE id = $question_id
+
+-- BLOCK edit_title
+UPDATE questions
+SET title = $title_value
+WHERE id = $question_id

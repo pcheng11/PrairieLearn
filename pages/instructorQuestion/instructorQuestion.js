@@ -99,17 +99,8 @@ function processIssue(req, res, callback) {
 }
 
 router.post('/', function(req, res, next) {
-    // console.log("Hi");
-    // console.log(req.body.title_value);
     if (req.body.__action == 'edit_title') {
-        // console.log(req.body.question_id);
-        // console.log(req.body.title_value);
-        var sql = "UPDATE questions SET title = ";
-        sql += '\''+ req.body.title_value + '\'';
-        sql += " WHERE id = ";
-        sql += req.body.question_id;
-        console.log(sql);
-        sqldb.query(sql, {}, function (err, result){
+        sqldb.query(sql.edit_title, { title_value: req.body.title_value, question_id: req.body.question_id }, function (err, result){
             if (ERR(err, next)) return;
             res.redirect(req.originalUrl);
         });
@@ -135,13 +126,7 @@ router.post('/', function(req, res, next) {
         });
     }
     else if (req.body.__action == 'edit_qid') {
-        console.log("ID");
-        var sql = "UPDATE questions SET  qid= ";
-        sql += '\'' + req.body.qid_value + '\'';
-        sql += " WHERE id = ";
-        sql += req.body.question_id;
-        console.log(sql);
-        sqldb.query(sql, {}, function (err, result) {
+        sqldb.query(sql.edit_qid, { qid_value: req.body.qid_value, question_id: req.body.question_id }, function (err, result) {
             if (ERR(err, next)) return;
             res.redirect(req.originalUrl);
         });
@@ -149,12 +134,8 @@ router.post('/', function(req, res, next) {
     
     }
     else if (req.body.__action == 'edit_type') {
-        var sql = "UPDATE questions SET type = ";
-        sql += '\'' + req.body.type_value + '\'';
-        sql += " WHERE id = ";
-        sql += req.body.question_id;
-        console.log(sql);
-        sqldb.query(sql, {}, function (err, result) {
+
+        sqldb.query(sql.edit_type, { type_value: req.body.type_value, question_id: req.body.question_id }, function (err, result) {
             if (ERR(err, next)) return;
             res.redirect(req.originalUrl);
         });
@@ -180,14 +161,8 @@ router.post('/', function(req, res, next) {
         // });
     }
     else if (req.body.__action == 'edit_topic') {
-        var sql = "UPDATE questions SET topic_id = ";
-        sql += "(SELECT id FROM topics WHERE name = ";
-        sql += '\'' + req.body.topic_value + '\''+ ")";
-        sql += " WHERE id = ";
-        sql += req.body.question_id;
-        console.log(sql);
-        console.log(req.body.topic_value);
-        sqldb.query(sql, {}, function (err, result) {
+
+        sqldb.query(sql.edit_topic, {topic_value:req.body.topic_value, question_id:req.body.question_id}, function (err, result) {
             if (ERR(err, next)) return;
             res.redirect(req.originalUrl);
         });
@@ -210,6 +185,42 @@ router.post('/', function(req, res, next) {
                 console.log(err);
             }
         });
+    }
+    else if (req.body.__action == 'edit_tag') {
+      
+        console.log(sql.get_number_of_tags);
+        
+        for (let i = 0; i < req.body.tag_id.length; i++)
+        {
+            sqldb.query(sql.get_number_of_tags, { tag_id: req.body.tag_id[i] }, function (err, result) {
+                if (ERR(err, next)) return;
+                res.locals.tag_number = result.rows[0];
+                console.log(result.rows[0]);
+            });
+            sqldb.query(sql.insert_question_tag, { question_id: req.body.question_id, tag_id: req.body.tag_id[i], tag_number: res.locals.tag_number}, function (err, result) {
+                if (ERR(err, next)) return;
+                res.redirect(req.originalUrl);
+            });
+        }
+        // question_dir = path.join(res.locals.course.path, 'questions', res.locals.question.directory);
+        // filePath = path.join(question_dir, 'info.json');
+        // fs.readFile(filePath, { encoding: 'utf-8' }, function (err, content2) {
+        //     if (!err) {
+        //         console.log(content2);
+        //         var new_content = JSON.parse(content2);
+        //         new_content.topic = req.body.topic_value;
+        //         fs.writeFile(filePath, JSON.stringify(new_content), function (err) {
+        //             if (err) {
+        //                 return console.log(err);
+        //             }
+        //             console.log("The file was saved!");
+        //             console.log(new_content);
+        //         });
+
+        //     } else {
+        //         console.log(err);
+        //     }
+        // });
     }
 
     else if (req.body.__action == 'grade' || req.body.__action == 'save') {
@@ -288,9 +299,6 @@ router.get('/', function(req, res, next) {
         (callback) => {
             sqldb.query(sql.get_topics, { course_id: res.locals.course.id }, function (err, result) {
                 if (ERR(err, callback)) return;
-                // console.log(res.locals.course.id)
-                // console.log("Hi")
-                // console.log(result.rows[0])
                 res.locals.topics = result.rows[0].topics;
                 callback(null);
             });
@@ -298,8 +306,6 @@ router.get('/', function(req, res, next) {
         (callback) => {
             sqldb.query(sql.get_tags, { course_id: res.locals.course.id }, function (err, result) {
                 if (ERR(err, callback)) return;
-                // console.log(res.locals.course.id)
-                // console.log(result.rows[0])
                 res.locals.alltags = result.rows[0].tags;
                 callback(null);
             });
